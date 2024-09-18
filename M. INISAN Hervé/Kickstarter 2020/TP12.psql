@@ -1,0 +1,60 @@
+SET SEARCH_PATH TO ks;
+
+/* 1. Liste de tous les projets.
+→ Vous devriez obtenir une grille faisant 374 864 lignes. */
+SELECT * FROM projects;
+
+/* 2. Liste des projets avec un financement (pledged) de 0. */
+SELECT * FROM projects
+WHERE pledged = 0;
+
+/* 3. Liste de tous les projets, par objectif (goal) décroissant. */
+SELECT * FROM projects
+ORDER BY goal DESC;
+
+/* 4. Liste des projets de la catégorie ’Games’. */
+SELECT * FROM projects
+WHERE category LIKE 'Games';
+
+/* 5. Liste des 10 projets les plus chers de la catégorie ’Games’. */
+SELECT * FROM projects
+WHERE category LIKE 'Games'
+ORDER BY usd_pledged DESC
+LIMIT 10;
+
+/* 6. Liste des 10 projets "aboutis" (successful) les plus chers, toutes catégories confondues.
+∎ On n’affichera que les colonnes name et goal.
+∎ La liste sera triée par objectif décroissant, et par nom croissant. */
+SELECT name, goal FROM projects
+WHERE state LIKE 'successful'
+ORDER BY goal DESC, name ASC
+LIMIT 10;
+
+/* 7. Liste des projets dont le nom contient ’zoo’.
+La liste sera triée par nom de projet. */
+SELECT * FROM projects
+WHERE name LIKE '%zoo%'
+ORDER BY name;
+
+/* 8. Liste des catégories principales différentes (main_category), triées par
+ordre alphabétique. */
+SELECT DISTINCT main_category FROM projects
+ORDER BY main_category ASC;
+
+/* 9. Liste des catégories différentes (category) triées par ordre alphabétique. */
+SELECT DISTINCT category FROM projects
+ORDER BY category ASC;
+
+/* 10. Liste des devises utilisées. */
+SELECT DISTINCT currency FROM projects;
+
+/* 11. Liste des 100 projets réussis avec des backers les plus généreux. ;)
+Les colonnes affichées doivent respecter la capture ci-dessous. */
+SELECT name, goal, backers, CAST((goal/backers) AS INTEGER) AS "Financement moyen" FROM projects
+WHERE state LIKE 'successful'
+ORDER BY (goal/backers) DESC
+LIMIT 100;
+
+/* 12. Liste des projets lancés et clôturés la même année. */
+SELECT * FROM projects
+WHERE DATE_PART('year', launched) = DATE_PART('year', deadline);

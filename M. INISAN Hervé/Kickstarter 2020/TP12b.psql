@@ -1,0 +1,64 @@
+SET SEARCH_PATH TO ks;
+
+/* 1. Quels sont les projets dont les promesses de dons sont supérieures à
+10 000 000 dollars ? (liste triée sur les promesses de dons, de la plus
+importante à la moins importante) */
+SELECT name, usd_pledged FROM projects
+WHERE usd_pledged > 10000000
+ORDER BY usd_pledged DESC;
+
+/* 2. Quels sont les projets dont les promesses de dons sont inférieures à 10
+dollars, mais non nulles? (liste triée sur les promesses de dons, de la
+plus importante à la moins importante) */
+SELECT name, usd_pledged FROM projects
+WHERE usd_pledged < 10
+AND usd_pledged != 0
+ORDER BY usd_pledged DESC;
+
+/* 3. Quelles sont les valeurs que peut prendre la colonne state? */
+SELECT DISTINCT state FROM projects;
+
+/* 4. De combien de pays différents sont issus les projets? */
+SELECT COUNT(DISTINCT country) AS "Nombre pays" FROM projects;
+
+/* 5. Quels sont les projets dont la main_category commence par un F?
+La liste sera triée sur la main_category et sur le nom de projet. */
+SELECT name, main_category FROM projects
+WHERE main_category LIKE 'F%'
+ORDER BY main_category ASC, name ASC;
+
+/* 6. Quels sont les films lancés en 2012? */
+SELECT name, category, launched FROM projects
+WHERE DATE_PART('year', launched) = 2012
+AND category LIKE '%Film%';
+
+/* 7.A Quelle est l’année du plus ancien projet? */
+SELECT name, launched FROM projects
+ORDER BY launched ASC
+LIMIT 1;
+
+/* 7.B Et celle du plus récent? */
+SELECT name, launched FROM projects
+ORDER BY launched DESC
+LIMIT 1;
+
+/* 8. Quels sont les projets de l’année 2016, réussis (successful), lancés en
+Grande-Bretagne, dans la catégorie Film & Video? */
+SELECT name, launched, state, country, category FROM projects
+WHERE DATE_PART('year', launched) = 2016
+AND state LIKE 'successful'
+AND country LIKE 'GB'
+AND category LIKE 'Film & Video';
+
+/* 9. Un seul projet répond à ces contraintes :
+∎ Il a été lancé au Mexique
+∎ Il a été réussi
+∎ Il a reçu des promesses de dons de plus de 200 000 dollars
+∎ Il a été publié dans la catégorie Crafts
+Quel est son nom ? */
+SELECT DISTINCT country FROM projects;
+SELECT name, country, state, pledged, category FROM projects
+WHERE country LIKE 'MX'
+AND state LIKE 'successful'
+AND pledged > 200000
+AND category LIKE 'Crafts';

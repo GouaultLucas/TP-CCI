@@ -1,0 +1,48 @@
+SET SEARCH_PATH TO ks;
+
+-- 1. Nombre total de projets.
+-- → Vous devriez retrouver la valeur 374 864 obtenue à l’importation des données.
+SELECT
+COUNT(*) AS "Nombre de projets"
+FROM projects;
+
+-- 2. Nombre total de backers (donateurs).
+SELECT
+SUM(backers) AS "Nombre total de backers"
+FROM projects;
+
+-- 3. Nombre de projets avec un financement (pledge) de 0.
+SELECT
+COUNT(*) AS "Nombre de projets n'ayant aucun financement"
+FROM projects
+WHERE pledged = 0;
+
+-- 4. Nombre de projets financés intégralement.
+SELECT
+COUNT(*) AS "Nombre de projets financés intégralement"
+FROM projects
+WHERE goal <= pledged;
+
+-- 5. Nombre de projets français
+SELECT
+COUNT(*) AS "Nombre de projets français"
+FROM projects
+WHERE country = 'FR';
+
+-- 6. Total et moyenne des objectifs.
+SELECT
+SUM(goal) AS "Somme des objectifs",
+AVG(goal) AS "Moyenne des objectifs"
+FROM projects;
+
+-- 7. Nombre de projets lancés en 2017.
+SELECT
+COUNT(*) AS "Nombre de projets lancés en 2017"
+FROM projects
+WHERE EXTRACT(YEAR FROM launched) = '2017';
+
+-- 8. Nombre de projets avec une deadline en 2017.
+SELECT
+COUNT(*) AS "Nombre de projets avec une deadline en 2017"
+FROM projects
+WHERE EXTRACT(YEAR FROM deadline) = '2017';

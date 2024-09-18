@@ -1,0 +1,23 @@
+#!/bin/bash
+# autheur: Gouault Lucas
+# date: 17/09/2024 11h17
+# fait avec amour
+
+# initialisation compteur
+COMPTEUR=0
+
+# intercepte le signal HUP et réinitialise le compteur à 0
+trap "echo 'Signal HUP intercepté, réinitialisation du compteur.' && COMPTEUR=0" 1
+
+# boucle infinie
+while(true)
+do
+        # attend 1 seconde
+        sleep 1;
+
+        # incrémente le compteur
+        COMPTEUR=$(($COMPTEUR + 1));
+
+        echo $COMPTEUR;
+
+done

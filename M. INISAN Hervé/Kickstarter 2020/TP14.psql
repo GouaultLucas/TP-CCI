@@ -1,0 +1,31 @@
+SET SEARCH_PATH TO ks;
+
+-- 1. Décompte des projets par pays.
+SELECT
+country AS "Pays",
+COUNT(*) AS "Nombre de projets"
+FROM projects
+GROUP BY country;
+
+-- 2. Nombre de projets par statut (state).
+SELECT
+state AS "Statut",
+COUNT(*) AS "Nombre de projets"
+FROM projects
+GROUP BY state;
+
+-- 3. Décompte des projets par année.
+SELECT
+EXTRACT(YEAR FROM launched) AS "Année",
+COUNT(*) AS "Nombre de projets"
+FROM projects
+GROUP BY EXTRACT(YEAR FROM launched);
+
+-- 4. Année la plus importante en nombre de projets.
+SELECT
+EXTRACT(YEAR FROM launched) AS "Année",
+COUNT(*) AS "Nombre de projets"
+FROM projects
+GROUP BY EXTRACT(YEAR FROM launched)
+ORDER BY COUNT(*) DESC
+LIMIT 1;

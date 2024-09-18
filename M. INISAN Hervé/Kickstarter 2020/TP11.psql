@@ -1,0 +1,22 @@
+/* CREATE DATABASE kickstarter; */
+
+DROP SCHEMA ks CASCADE;
+CREATE SCHEMA ks;
+
+SET SEARCH_PATH TO ks;
+
+CREATE TABLE projects(
+    id SERIAL NOT NULL,
+    name VARCHAR NOT NULL,
+    category VARCHAR NOT NULL,
+    main_category VARCHAR NOT NULL,
+    currency CHAR(3) NOT NULL,
+    deadline TIMESTAMP NOT NULL,
+    goal NUMERIC NOT NULL,
+    launched TIMESTAMP NOT NULL,
+    pledged NUMERIC NOT NULL,
+    state VARCHAR NOT NULL,
+    backers INT NOT NULL,
+    country CHAR(2) NOT NULL,
+    usd_pledged NUMERIC NOT NULL
+);

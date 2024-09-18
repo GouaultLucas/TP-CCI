@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# multi [nombre] : affiche ma table de multiplication de 1 jusqu'au nombre
+#
+# - Contrôle du paramètre : doit être un entier, inférieur à 15
+#      sinon sortie avec code retour 1
+#
+# - affiche de manière propre dont formatée :
+#   un espace entre mes nombres
+#   chaque nombre affiché sur 4 positions, aligné à droite, ça doit laisser un espace entre les nombres
+
+#    1 2 3 4  5  6  7
+#  +-------------------
+# 1| 1 2 3 4  5  6  ...
+# 2| 2 4 6 8 10 12
+# 3| 3 6 9 ...
+# 4|
+# 5|
+
+# fonctions
+# entete : affiche les 2 lignes de titre
+# ligne : affiche la ligne demandée en param: exemple d'appel ligne 2
+
+# codes erreur:
+# - 100: La valeur spécifiée n'est pas un nombre
+# - 101: La valeur spécifiée est trop grande
+
+N=5
+
+if (($# != 0))
+then
+        N=$1
+        [ "${N//[0-9]}" != "" ] && echo "ERR: La valeur spécifiée n'est pas un nombre." && exit 100
+        [ "${N}" -gt 31 ] && echo "ERR: La valeur spécifiée est trop grande." && exit 101
+fi
+
+# Répète une chaîne de texte un nombre de fois
+function repeter() {
+        CHAINE=$1
+        NB=$2
+
+        printf "%${NB}s" " " | tr ' ' '-'
+}
+
+function entete() {
+        # ligne 1
+        printf "\u2639    "
+        TAILLE=0
+        for M in $(seq 1 $N)
+        do
+                printf "%4d" "$M"
+
+        done
+
+        echo
+
+        # ligne 2
+        printf "   +-"
+        for J in $(seq 1 $N)
+        do
+                repeter "-" 4
+        done
+
+        echo
+}
+
+function ligne() {
+        MULTIPLE=$1
+        MAX=$2
+
+        if ((${MULTIPLE} < 10))
+        then
+                printf " "
+        fi
+
+        printf "${MULTIPLE} | "
+
+        for I in $(seq 1 "$((${MAX}))")
+        do
+                printf "%4d" $(("${I}" * "${MULTIPLE}"))
+        done
+
+        echo
+}
+
+entete
+
+for K in $(seq 1 $N)
+do
+        ligne $K $N
+done

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+NB=$(($RANDOM%100 + 1))
+
+MAX_TRY=10
+COUPS=0
+
+AIDE=""
+
+clear
+
+echo "Devinez un nombre entre 1 et 100."
+echo "Des indices vous seront donnés à chaque réponse."
+echo "Utilisez intelligemment et judicieusement ces indices."
+echo
+echo
+
+while ((COUPS++ < MAX_TRY));
+do
+        read -t 18 -p "($COUPS/$MAX_TRY) Donnez un nombre de 1 à 100$AIDE : "
+
+        if [ $? = 0 ]
+        then
+                [ "$REPLY" = "" ] && echo "Un coup sacrifié par votre paresse." && echo && continue
+                [ "${REPLY//[0-9]}" != "" ] && echo "Un coup sacrifié par votre ignorance." && echo && continue
+                [ "$REPLY" = "$NB" ] && echo "Vous avez gagné en $COUPS tentatives." && echo "Toutes mes félicitations." && echo && exit 0
+
+                if (( "$NB" > "$REPLY" ))
+                then
+                        AIDE=", plus grand que $REPLY"
+                else
+                        AIDE=", plus petit que $REPLY"
+                fi
+
+                echo && echo
+        else
+                echo "?"
+                echo "Un coup sacrifié par votre lenteur."
+                echo
+        fi
+done
+
+echo "Toutes vos tentatives ont été sacrifiées."
+echo "Vous ferez mieux la prochaine fois, je l'espère."
+echo
