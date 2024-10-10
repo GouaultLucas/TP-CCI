@@ -1,9 +1,16 @@
-package tests;
+
 
 import java.util.Date;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import modele.Compte;
@@ -12,8 +19,55 @@ import modele.ModePaiement;
 import modele.TypeCompte;
 
 public class App {
-    private static ArrayList<Compte> comptes = new ArrayList<Compte>();
-    private static ArrayList<CompteEpargne> comptesEpargne = new ArrayList<CompteEpargne>();
+    private static final String fichierComptes = "comptes.ser";
+    private static ArrayList<Compte> comptes;
+
+    private static void sauvegarderDonnees() {
+        ObjectOutputStream oos = null;
+
+        try {
+            final FileOutputStream fichier = new FileOutputStream(fichierComptes);
+            oos = new ObjectOutputStream(fichier);
+            oos.writeObject(comptes);
+        } catch (final java.io.IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (oos != null) {
+                    oos.flush();
+                    oos.close();
+                }
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void chargerDonnees() {
+        if(new File(fichierComptes).exists()) {
+            ObjectInputStream ois = null;
+
+            try {
+                final FileInputStream fichier = new FileInputStream(fichierComptes);
+                ois = new ObjectInputStream(fichier);
+                comptes = (ArrayList<Compte>) ois.readObject();
+            } catch (final java.io.IOException e) {
+                e.printStackTrace();
+            } catch (final ClassNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ois != null) {
+                        ois.close();
+                    }
+                } catch (final IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } else comptes = new ArrayList<Compte>();
+    }
+
     private static boolean compteExiste(Integer numero) {
         boolean retour = false;
 
@@ -26,18 +80,7 @@ public class App {
 
         return retour;
     }
-    private static boolean compteEpargneExiste(Integer numero) {
-        boolean retour = false;
 
-        for (CompteEpargne compte : comptesEpargne) {
-            if(compte.getNumero().equals(numero)) {
-                retour = true;
-                break;
-            }
-        }
-
-        return retour;
-    }
     private static Compte getCompte(Integer numero) {
         Compte retour = null;
 
@@ -47,24 +90,19 @@ public class App {
 
         return retour;
     }
-    private static CompteEpargne getCompteEpargne(Integer numero) {
-        CompteEpargne retour = null;
 
-        for (CompteEpargne compte : comptesEpargne) {
-            if(compte.getNumero().equals(numero)) retour = compte;
-        }
-
-        return retour;
-    }
     public static void main(String[] args) {
         boolean quitter = false;
 
+        chargerDonnees();
+
         while (!quitter) {
-            String choix = MenuPrincipal();
+            String choix = menuPrincipal();
 
             switch (choix) {
                 case "1":
                     menuCreationCompte();
+                    sauvegarderDonnees();
                     break;
 
                 case "2":
@@ -73,9 +111,13 @@ public class App {
 
                 case "3":
                     menuCreerLigneComptable();
+                    sauvegarderDonnees();
                     break;
 
                 case "4":
+                    afficherComptes();
+                    break;
+                case "5":
                     quitter = true;
                     break;
 
@@ -85,21 +127,23 @@ public class App {
         }
     }
 
-    public static String MenuPrincipal() {
+    public static String menuPrincipal() {
         System.out.println("Que voulez vous faire ?\n");
         System.out.println("\t1. Créer un compte");
         System.out.println("\t2. Afficher un compte");
         System.out.println("\t3. Créer une ligne comptable");
-        System.out.println("\t4. Quitter\n\n");
+        System.out.println("\t4. Afficher tous les comptes");
+        System.out.println("\t5. Quitter\n\n");
 
         String choix = attendreSaisieClavier();
 
         return choix;
     }
 
+    private static Scanner scanner = new Scanner(System.in);
+
     public static String attendreSaisieClavier() {
-        Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine();
+        return scanner.nextLine().toString();
     }
 
     public static void menuCreationCompte() {
@@ -173,8 +217,10 @@ public class App {
                 saisie = attendreSaisieClavier();
     
                 try {
-                    soldeBase = Float.parseFloat(saisie);
-                    suivant = true;
+                    tauxPlacement = Float.parseFloat(saisie);
+
+                    if(CompteEpargne.controleTaux(tauxPlacement)) suivant = true;
+                    else System.out.println("Le taux de placement ne peut pas être négatif.");
                 } catch(NumberFormatException err) {
                     System.out.println("Vous n'avez pas entré de taux de placement valide (uniquement composé de chiffres)");
                 }
@@ -182,14 +228,14 @@ public class App {
         }
 
         if(type.equals(TypeCompte.EPARGNE)) {
-            CompteEpargne compte = new CompteEpargne(type, numero, soldeBase, tauxPlacement, null);
-            comptesEpargne.add(compte);
+            CompteEpargne compte = new CompteEpargne(numero, soldeBase, tauxPlacement);
+            comptes.add(compte);
 
             System.out.println("\nLe compte avec ces informations a été créé:");
             compte.afficher();
 
         } else {
-            Compte compte = new Compte(type, numero, soldeBase, null);
+            Compte compte = new Compte(type, numero, soldeBase);
             comptes.add(compte);
 
             System.out.println("\nLe compte avec ces informations a été créé:");
@@ -215,10 +261,8 @@ public class App {
             }
         }
 
-        Compte compte = getCompte(numero);
-
-        if(compte == null) System.out.println("Ce compte n'existe pas");
-        else compte.afficher();
+        if(!compteExiste(numero)) System.out.println("Ce compte n'existe pas");
+        else getCompte(numero).afficher();
 
         System.out.println();
     }
@@ -313,11 +357,51 @@ public class App {
                 System.out.println("Vous n'avez pas entré un mode de paiement valide");
             }
         }
-
+        
         Compte compte = getCompte(numero);
 
         String dateString = new SimpleDateFormat("dd/MM/yyyy").format(date);
 
         compte.creerLigneComptable(somme, dateString, motif, modePaiement);
+    }
+
+    private static void triBulles(ArrayList<Compte> liste) {
+        int n = liste.size();
+        boolean echange;
+
+        for (int i = 0; i < n - 1; i++) {
+            echange = false;
+            for (int j = 0; j < n - 1 - i; j++) {
+                // Comparer le numéro des comptes
+                if (liste.get(j).getNumero() > liste.get(j + 1).getNumero()) {
+                    // Échanger les éléments
+                    Compte temp = liste.get(j);
+                    liste.set(j, liste.get(j + 1));
+                    liste.set(j + 1, temp);
+                    echange = true;
+                }
+            }
+            // Si aucun échange n'a eu lieu, le tableau est déjà trié
+            if (!echange) {
+                break;
+            }
+        }
+    }
+
+    public static void afficherComptes() {
+        System.out.println("\nAffichage de tous les comptes:");
+
+        if(comptes.size() == 0) {
+            System.out.println("Aucun compte");
+        } else {
+            Collections.sort(comptes);
+
+            for (Compte compte : comptes) {
+                if(compte.getType().equals(TypeCompte.EPARGNE)) ((CompteEpargne) compte).afficherUneLigne();
+                else compte.afficherUneLigne();
+            }
+        }
+
+        System.out.println();
     }
 }
