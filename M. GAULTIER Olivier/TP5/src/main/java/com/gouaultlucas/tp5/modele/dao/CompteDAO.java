@@ -17,12 +17,12 @@ public class CompteDAO {
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setInt(1, compte.getNumero());
-            statement.setInt(2, compte.getType().ordinal() + 1); // Conversion du type en entier (ordinal)
+            statement.setInt(2, compte.getType().ordinal());
             statement.setFloat(3, compte.getSolde());
             if (compte instanceof CompteEpargne) {
                 statement.setFloat(4, ((CompteEpargne) compte).getTauxPlacement());
             } else {
-                statement.setNull(4, Types.FLOAT); // NULL pour les comptes courants
+                statement.setNull(4, Types.FLOAT);
             }
             return statement.executeUpdate() > 0;
 
@@ -35,28 +35,31 @@ public class CompteDAO {
     // Méthode pour lire un compte par son numéro
     public Compte lireCompte(int numero) {
         String query = "SELECT * FROM Compte WHERE numero = ?";
+        Compte compte = null;
+
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+            PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setInt(1, numero);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 int typeId = resultSet.getInt("type_compte_id");
-                TypeCompte typeCompte = (typeId == 1) ? TypeCompte.COURANT : TypeCompte.EPARGNE;
+                TypeCompte typeCompte = TypeCompte.values()[typeId];
                 float solde = resultSet.getFloat("solde");
                 Float tauxPlacement = resultSet.getObject("taux_placement") != null ? resultSet.getFloat("taux_placement") : null;
 
                 if (typeCompte == TypeCompte.EPARGNE) {
-                    return new CompteEpargne(numero, solde, tauxPlacement);
+                    compte = new CompteEpargne(numero, solde, tauxPlacement);
                 } else {
-                    return new Compte(typeCompte, numero, solde);
+                    compte = new Compte(typeCompte, numero, solde);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;  // Aucun compte trouvé
+
+        return compte;
     }
 
     // Méthode pour mettre à jour un compte
