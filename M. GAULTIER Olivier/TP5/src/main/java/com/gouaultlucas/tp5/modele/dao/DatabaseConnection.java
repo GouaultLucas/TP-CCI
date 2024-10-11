@@ -41,4 +41,16 @@ public class DatabaseConnection {
             }
         }
     }
+
+    public static boolean testerConnexion() {
+        try (Connection connection = getConnection()) {
+            if (connection != null && !connection.isClosed()) {
+                System.out.println("La connexion à la base de données est réussie !");
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("Échec de la connexion à la base de données : " + e.getMessage());
+        }
+        return false;
+    }
 }

@@ -1,5 +1,6 @@
 package com.gouaultlucas.tp5.controleurs;
 
+import com.gouaultlucas.tp5.modele.dao.DatabaseConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

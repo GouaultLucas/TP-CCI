@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gouaultlucas.tp5.controleurs.CreerCompte">
+<AnchorPane prefHeight="375.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gouaultlucas.tp5.controleurs.CreerCompte">
    <children>
       <Label layoutX="14.0" layoutY="14.0" text="Créer un compte bancaire">
          <font>
@@ -73,10 +73,11 @@
             <Font size="16.0" />
          </font>
       </Button>
-      <Label layoutX="14.0" layoutY="326.0" text="Erreur" textFill="RED">
+      <Label layoutX="14.0" layoutY="336.0" text="Erreur" textFill="RED" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="543.0" AnchorPane.topAnchor="345.0">
          <font>
             <Font size="16.0" />
          </font>
       </Label>
+      <Separator layoutX="4.0" layoutY="324.0" prefHeight="5.0" prefWidth="593.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="340.0" />
    </children>
 </AnchorPane>
